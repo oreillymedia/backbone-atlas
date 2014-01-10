@@ -1,0 +1,83 @@
+[
+  {
+    "id": 3,
+    "branch": "master",
+    "created_at": "2014-01-03T12:00:00Z",
+    "project": "user/Booohhh",
+    "build_url": "/api/builds/3",
+    "status": [
+      {
+        "id": 27,
+        "uuid": "08cc229cb7b037677358f0a73940457e",
+        "format": "pdf",
+        "download_url": "some.url/file.pdf",
+        "status": "completed",
+        "message": {
+          "debug": [],
+          "info": ["Building web PDF", "Done Building PDF"],
+          "warn": ["WARNING: Unable to autogenerate TOC: no TOC nav element found."],
+          "error": []
+        }
+      }
+    ],
+    "user": {
+      "id": 1,
+      "nickname": "runemadsen",
+      "image": "some.url"
+    }
+  },
+  {
+    "id": 2,
+    "branch": "master",
+    "created_at": "2014-01-02T12:00:00Z",
+    "project": "user/Ahhhhhhh",
+    "build_url": "/api/builds/2",
+    "status": [
+      {
+        "id": 27,
+        "uuid": "08cc229cb7b037677358f0a73940457e",
+        "format": "pdf",
+        "download_url": "some.url/file.pdf",
+        "status": "completed",
+        "message": {
+          "debug": [],
+          "info": ["Building web PDF", "Done Building PDF"],
+          "warn": ["WARNING: Unable to autogenerate TOC: no TOC nav element found."],
+          "error": []
+        }
+      }
+    ],
+    "user": {
+      "id": 1,
+      "nickname": "runemadsen",
+      "image": "some.url"
+    }
+  },
+  {
+    "id": 1,
+    "branch": "master",
+    "created_at": "2014-01-01T12:00:00Z",
+    "project": "user/Ceeeeeee",
+    "build_url": "/api/builds/1",
+    "status": [
+      {
+        "id": 27,
+        "uuid": "08cc229cb7b037677358f0a73940457e",
+        "format": "pdf",
+        "download_url": "some.url/file.pdf",
+        "status": "completed",
+        "message": {
+          "debug": [],
+          "info": ["Building web PDF", "Done Building PDF"],
+          "warn": ["WARNING: Unable to autogenerate TOC: no TOC nav element found."],
+          "error": []
+        }
+      }
+    ],
+    "user": {
+      "id": 1,
+      "nickname": "runemadsen",
+      "image": "some.url"
+    }
+  }
+]
