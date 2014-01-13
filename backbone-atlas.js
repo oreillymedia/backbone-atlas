@@ -29,9 +29,27 @@
         return "" + root.url + "/builds";
       },
       model: root.Build,
+      initialize: function(models, options) {
+        if (options == null) {
+          options = {};
+        }
+        if (!options.project) {
+          throw root.Builds.ERROR_INIT_NO_PROJECT;
+        }
+        return this.project = options.project;
+      },
+      fetch: function(options) {
+        return root.Collection.prototype.fetch.call(this, _.extend({
+          data: {
+            project: this.project
+          }
+        }, options));
+      },
       comparator: function(b) {
         return -b.get('created_at');
       }
+    }, {
+      ERROR_INIT_NO_PROJECT: "You have to initialize this collection with a project path in options"
     });
     this.Token = this.Model.extend();
     this.Tokens = this.Collection.extend({

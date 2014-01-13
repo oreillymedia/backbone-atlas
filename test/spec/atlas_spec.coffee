@@ -86,4 +86,26 @@ describe("Atlas", ->
       )
     )
   )
+
+  describe("Builds", ->
+
+    describe("#initialize", ->
+      it("should throw error if no project path", ->
+        expect(-> new atlas.Builds()).toThrow(new Error(atlas.Builds.ERROR_INIT_NO_PROJECT));
+      )
+    )
+
+    describe("#fetch", ->
+      it("should call correct URL", ->
+        builds = new atlas.Builds([], project:"user/project")
+        spyOnAjax()
+        builds.fetch()
+        expect(lastAjaxCall().args[0].type).toEqual("GET")
+        expect(lastAjaxCall().args[0].url).toEqual(url + "/builds")
+        expect(lastAjaxCall().args[0].data).toNotBe(undefined)
+        expect(lastAjaxCall().args[0].data.project).toBe("user/project")
+      )
+    )
+
+  )
 )

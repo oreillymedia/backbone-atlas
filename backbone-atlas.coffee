@@ -41,7 +41,17 @@ Atlas = (url, token) ->
   @Builds = @Collection.extend(
     url: -> "#{root.url}/builds"
     model: root.Build
+    
+    initialize: (models, options = {}) ->
+      if !options.project then throw root.Builds.ERROR_INIT_NO_PROJECT
+      @project = options.project
+
+    fetch: (options) ->
+      root.Collection.prototype.fetch.call(this, _.extend(data: project: @project, options))
+    
     comparator: (b) -> -b.get('created_at')
+  ,
+    ERROR_INIT_NO_PROJECT : "You have to initialize this collection with a project path in options"
   )
 
   # Tokens
