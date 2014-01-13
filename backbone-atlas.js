@@ -7,8 +7,24 @@
     root = this;
     this.url = url;
     this.token = token;
-    this.Model = Backbone.Model.extend();
-    this.Collection = Backbone.Collection.extend();
+    this.sync = function(method, model, options) {
+      if (root.token) {
+        if (!options) {
+          options = {};
+        }
+        if (!options.data) {
+          options.data = {};
+        }
+        options.data.auth_token = root.token;
+      }
+      return Backbone.sync(method, model, options);
+    };
+    this.Model = Backbone.Model.extend({
+      sync: this.sync
+    });
+    this.Collection = Backbone.Collection.extend({
+      sync: this.sync
+    });
     this.Build = this.Model.extend({
       backboneClass: "Build",
       toJSON: function() {

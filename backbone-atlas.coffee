@@ -7,19 +7,15 @@ Atlas = (url, token) ->
   # Sync
   # --------------------------------------------------------
 
-  #@sync = (method, model, options) ->
-  #  extendedOptions = undefined
-  #  extendedOptions = _.extend(
-  #    beforeSend: (xhr) ->
-  #      xhr.setRequestHeader "PRIVATE-TOKEN", root.token if root.token
-  #  , options)
-  #  Backbone.sync method, model, extendedOptions
-#
-  #@Model = Backbone.Model.extend(sync: @sync)
-  #@Collection = Backbone.Collection.extend(sync: @sync)
-
-  @Model = Backbone.Model.extend()
-  @Collection = Backbone.Collection.extend()
+  @sync = (method, model, options) ->
+    if root.token
+      options = {} unless options
+      options.data = {} unless options.data
+      options.data.auth_token = root.token
+    Backbone.sync method, model, options
+  
+  @Model = Backbone.Model.extend(sync: @sync)
+  @Collection = Backbone.Collection.extend(sync: @sync)
 
   # Builds
   # --------------------------------------------------------
@@ -41,11 +37,19 @@ Atlas = (url, token) ->
   @Builds = @Collection.extend(
     url: -> "#{root.url}/builds"
     model: root.Build
-    
+
+    # Initialize collection.
+    #
+    # options.project - String value of username/project to load builds from
+    #
+    # Returns nothing.    
     initialize: (models, options = {}) ->
       if !options.project then throw root.Builds.ERROR_INIT_NO_PROJECT
       @project = options.project
 
+    # Custom fetch function. Used to add project info in fetch call.
+    #
+    # Returns nothing.
     fetch: (options) ->
       root.Collection.prototype.fetch.call(this, _.extend(data: project: @project, options))
     
