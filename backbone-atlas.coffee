@@ -88,13 +88,13 @@ Atlas = (url, token) ->
 
   @LoginRegistrationCode = @Model.extend(
     url: ->
-      url = "/api/login_registration_codes"
+      url = "#{root.url}/login_registration_codes"
       url += "/" +  this.get("code") if this.get("id")
       return url
   )
 
   @LoginRegistrationCodes = @Collection.extend(
-    url: "/api/login_registration_codes"
+    url: "#{root.url}/login_registration_codes"
     model: root.LoginRegistrationCode
   )
 
