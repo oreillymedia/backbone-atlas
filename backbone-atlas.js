@@ -7,24 +7,8 @@
     root = this;
     this.url = url;
     this.token = token;
-    this.sync = function(method, model, options) {
-      if (root.token) {
-        if (!options) {
-          options = {};
-        }
-        if (!options.data) {
-          options.data = {};
-        }
-        options.data.auth_token = root.token;
-      }
-      return Backbone.sync(method, model, options);
-    };
-    this.Model = Backbone.Model.extend({
-      sync: this.sync
-    });
-    this.Collection = Backbone.Collection.extend({
-      sync: this.sync
-    });
+    this.Model = Backbone.Model.extend();
+    this.Collection = Backbone.Collection.extend();
     this.Build = this.Model.extend({
       backboneClass: "Build",
       toJSON: function() {
@@ -61,6 +45,10 @@
           }
         }, options));
       },
+      create: function(attributes, options) {
+        attributes.project = this.project;
+        return root.Collection.prototype.create.call(this, attributes, options);
+      },
       comparator: function(b) {
         return -b.get('created_at');
       }
@@ -91,7 +79,7 @@
     });
     this.LoginRegistrationCode = this.Model.extend({
       url: function() {
-        url = "/api/login_registration_codes";
+        url = "" + root.url + "/login_registration_codes";
         if (this.get("id")) {
           url += "/" + this.get("code");
         }
@@ -99,7 +87,7 @@
       }
     });
     this.LoginRegistrationCodes = this.Collection.extend({
-      url: "/api/login_registration_codes",
+      url: "" + root.url + "/login_registration_codes",
       model: root.LoginRegistrationCode
     });
     return this;

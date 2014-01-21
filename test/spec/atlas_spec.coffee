@@ -52,15 +52,9 @@ describe("Atlas", ->
 
   describe("Atlas", ->
 
-    it("should initialize with url and token", ->
-      expect(atlas.url).toBe(url)
-      expect(atlas.token).toBe(token)
-    )
-
-    it("should initialize with url only", ->
+    it("should initialize with url", ->
       atlas = new Atlas(url)
       expect(atlas.url).toBe(url)
-      expect(atlas.token).toBe(undefined)
     )
   )
 
@@ -96,14 +90,29 @@ describe("Atlas", ->
     )
 
     describe("#fetch", ->
-      it("should call correct URL", ->
+      it("should add project data to call", ->
         builds = new atlas.Builds([], project:"user/project")
         spyOnAjax()
         builds.fetch()
         expect(lastAjaxCall().args[0].type).toEqual("GET")
         expect(lastAjaxCall().args[0].url).toEqual(url + "/builds")
-        expect(lastAjaxCall().args[0].data).toNotBe(undefined)
-        expect(lastAjaxCall().args[0].data.project).toBe("user/project")
+        expect(lastAjaxCallData()).toNotBe(undefined)
+        expect(lastAjaxCallData().project).toBe("user/project")
+      )
+    )
+
+    describe("#create", ->
+      it("should add project data to call", ->
+        builds = new atlas.Builds([], project:"user/project")
+        spyOnAjax()
+        builds.create(
+          formats:"pdf,epub"
+          branch:"master"
+        )
+        expect(lastAjaxCall().args[0].type).toEqual("POST")
+        expect(lastAjaxCall().args[0].url).toEqual(url + "/builds")
+        expect(lastAjaxCallData()).toNotBe(undefined)
+        expect(lastAjaxCallData().project).toBe("user/project")
       )
     )
 

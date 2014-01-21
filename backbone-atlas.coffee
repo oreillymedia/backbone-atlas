@@ -6,22 +6,15 @@ Atlas = (url, token) ->
 
   # Sync
   # --------------------------------------------------------
-
-  @sync = (method, model, options) ->
-    if root.token
-      options = {} unless options
-      options.data = {} unless options.data
-      options.data.auth_token = root.token
-    Backbone.sync method, model, options
-  
-  @Model = Backbone.Model.extend(sync: @sync)
-  @Collection = Backbone.Collection.extend(sync: @sync)
+  @Model = Backbone.Model.extend()
+  @Collection = Backbone.Collection.extend()
 
   # Builds
   # --------------------------------------------------------
 
   @Build = @Model.extend(
     backboneClass: "Build"
+
     toJSON: ->
       json = _.clone(@attributes)
       json.status = _.map(json.status, (bf) ->
@@ -52,6 +45,11 @@ Atlas = (url, token) ->
     # Returns nothing.
     fetch: (options) ->
       root.Collection.prototype.fetch.call(this, _.extend(data: project: @project, options))
+
+    # Custom create function. Used to add project info to create call
+    create: (attributes, options) ->
+      attributes.project = @project
+      root.Collection.prototype.create.call(this, attributes, options)
     
     comparator: (b) -> -b.get('created_at')
   ,
