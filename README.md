@@ -30,7 +30,7 @@ npm install
 Then run this command from the root folder:
 
 ```bash
-npm run build-js
+npm run watch-js
 npm run test
 ```
 
