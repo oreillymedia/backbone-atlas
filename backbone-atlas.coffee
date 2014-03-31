@@ -53,7 +53,7 @@ Atlas = (url, token) ->
     
     comparator: (b) -> -b.get('created_at')
   ,
-    ERROR_INIT_NO_PROJECT : "You have to initialize this collection with a project path in options"
+    ERROR_INIT_NO_PROJECT : "You have to initialize this collection with a project path"
   )
 
   # Tokens
@@ -94,6 +94,39 @@ Atlas = (url, token) ->
   @LoginRegistrationCodes = @Collection.extend(
     url: "#{root.url}/login_registration_codes"
     model: root.LoginRegistrationCode
+  )
+
+  # Collaborators
+  # --------------------------------------------------------
+
+  @Collaborator = @Model.extend()
+
+  @Collaborators = @Collection.extend(
+
+    model: root.Collaborator
+    url: -> "#{root.url}/collaborators"
+
+    initialize: (models, options = {}) ->
+      if !options.project && !options.group then throw root.Collaborators.ERROR_INIT
+      if options.project?
+        @collaborator_type = "project"
+        @collaborator_id = options.project
+      else
+        @collaborator_type = "group"
+        @collaborator_id = options.group
+
+    # Custom create function. Used to add project or group info to create call
+    fetch: (options) ->
+      extra_data = {}
+      extra_data[@collaborator_type] = @collaborator_id
+      root.Collection.prototype.fetch.call(this, _.extend(data: extra_data, options))
+
+    # Custom create function. Used to add project or group info to create call
+    create: (attributes, options) ->
+      attributes[@collaborator_type] = @collaborator_id
+      root.Collection.prototype.create.call(this, attributes, options)
+  ,
+    ERROR_INIT : "You have to initialize this collection with a project path or group id"
   )
 
   # Initialize

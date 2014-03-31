@@ -53,7 +53,7 @@
         return -b.get('created_at');
       }
     }, {
-      ERROR_INIT_NO_PROJECT: "You have to initialize this collection with a project path in options"
+      ERROR_INIT_NO_PROJECT: "You have to initialize this collection with a project path"
     });
     this.Token = this.Model.extend();
     this.Tokens = this.Collection.extend({
@@ -89,6 +89,42 @@
     this.LoginRegistrationCodes = this.Collection.extend({
       url: "" + root.url + "/login_registration_codes",
       model: root.LoginRegistrationCode
+    });
+    this.Collaborator = this.Model.extend();
+    this.Collaborators = this.Collection.extend({
+      model: root.Collaborator,
+      url: function() {
+        return "" + root.url + "/collaborators";
+      },
+      initialize: function(models, options) {
+        if (options == null) {
+          options = {};
+        }
+        if (!options.project && !options.group) {
+          throw root.Collaborators.ERROR_INIT;
+        }
+        if (options.project != null) {
+          this.collaborator_type = "project";
+          return this.collaborator_id = options.project;
+        } else {
+          this.collaborator_type = "group";
+          return this.collaborator_id = options.group;
+        }
+      },
+      fetch: function(options) {
+        var extra_data;
+        extra_data = {};
+        extra_data[this.collaborator_type] = this.collaborator_id;
+        return root.Collection.prototype.fetch.call(this, _.extend({
+          data: extra_data
+        }, options));
+      },
+      create: function(attributes, options) {
+        attributes[this.collaborator_type] = this.collaborator_id;
+        return root.Collection.prototype.create.call(this, attributes, options);
+      }
+    }, {
+      ERROR_INIT: "You have to initialize this collection with a project path or group id"
     });
     return this;
   };
