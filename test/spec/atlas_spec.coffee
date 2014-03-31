@@ -24,7 +24,7 @@
 
 ajaxTimeout = 1000
 token = "abcdefg"
-url = "http://127.0.0.1:5000"
+url = "http://127.0.0.1:5001"
 
 describe("Atlas", ->
 
@@ -38,13 +38,13 @@ describe("Atlas", ->
   # ----------------------------------------------------------------
 
   spyOnAjax = ->
-    spyOn(Backbone, "ajax").andCallThrough()
+    spyOn(Backbone, "ajax").and.callThrough()
 
   lastAjaxCall = ->
-    Backbone.ajax.mostRecentCall
+    Backbone.ajax.calls.mostRecent()
 
   lastAjaxCallData = ->
-    d = Backbone.ajax.mostRecentCall.args[0].data || {}
+    d = Backbone.ajax.calls.mostRecent().args[0].data || {}
     if _.isString(d) then JSON.parse(d) else d
 
   # Atlas
@@ -85,7 +85,7 @@ describe("Atlas", ->
 
     describe("#initialize", ->
       it("should throw error if no project path", ->
-        expect(-> new atlas.Builds()).toThrow(new Error(atlas.Builds.ERROR_INIT_NO_PROJECT));
+        expect(-> new atlas.Builds()).toThrow(atlas.Builds.ERROR_INIT_NO_PROJECT);
       )
     )
 
@@ -96,7 +96,7 @@ describe("Atlas", ->
         builds.fetch()
         expect(lastAjaxCall().args[0].type).toEqual("GET")
         expect(lastAjaxCall().args[0].url).toEqual(url + "/builds")
-        expect(lastAjaxCallData()).toNotBe(undefined)
+        expect(lastAjaxCallData()).not.toBe(undefined)
         expect(lastAjaxCallData().project).toBe("user/project")
       )
     )
@@ -111,10 +111,72 @@ describe("Atlas", ->
         )
         expect(lastAjaxCall().args[0].type).toEqual("POST")
         expect(lastAjaxCall().args[0].url).toEqual(url + "/builds")
-        expect(lastAjaxCallData()).toNotBe(undefined)
+        expect(lastAjaxCallData()).not.toBe(undefined)
         expect(lastAjaxCallData().project).toBe("user/project")
       )
     )
 
+  )
+
+  # Atlas.Collaborators
+  # ----------------------------------------------------------------
+
+  describe("Collaborators", ->
+  
+    describe("#fetch", ->
+      
+      it("should fetch pending invites for group", (done) ->
+        collection = new atlas.Collaborators([], group: 1)
+        collection.fetch(success: -> 
+          expect(collection.length).toEqual(2)
+          expect(collection.first().get("group")).toEqual("1")
+          done()
+        )
+      )
+  
+      it("should fetch pending invites for project", (done) ->
+        collection = new atlas.Collaborators([], project: "user/project")
+        collection.fetch(success: -> 
+          expect(collection.length).toEqual(2)
+          expect(collection.first().get("project")).toEqual("user/project")
+          done()
+        )
+      )
+    )
+  )
+  
+  describe("#create", ->
+    
+    it("should create collaborator for group", ->
+      collection = new atlas.Collaborators([], group:1)
+      spyOnAjax()
+      collection.create(
+        email: "first@user.com"
+        permission_level: 40
+        group_name: "somegroup"
+      )
+      expect(lastAjaxCall().args[0].type).toEqual("POST")
+      expect(lastAjaxCall().args[0].url).toEqual(url + "/collaborators")
+      expect(lastAjaxCallData()).not.toBe(undefined)
+      expect(lastAjaxCallData().group).toBe(1)
+      expect(lastAjaxCallData().group_name).toEqual("somegroup")
+      expect(lastAjaxCallData().email).toEqual("first@user.com")
+      expect(lastAjaxCallData().permission_level).toEqual(40)
+    )
+  
+    it("should create collaborator for project", ->
+      collection = new atlas.Collaborators([], project:"user/project")
+      spyOnAjax()
+      collection.create(
+        email: "first@user.com"
+        permission_level: 40
+      )
+      expect(lastAjaxCall().args[0].type).toEqual("POST")
+      expect(lastAjaxCall().args[0].url).toEqual(url + "/collaborators")
+      expect(lastAjaxCallData()).not.toBe(undefined)
+      expect(lastAjaxCallData().project).toEqual("user/project")
+      expect(lastAjaxCallData().email).toEqual("first@user.com")
+      expect(lastAjaxCallData().permission_level).toEqual(40)
+    )
   )
 )

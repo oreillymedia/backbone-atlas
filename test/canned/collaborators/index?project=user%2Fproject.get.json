@@ -1,0 +1,20 @@
+[
+  {
+    "email": "first@user.com",
+    "permission_level": 40,
+    "project": "user/project",
+    "invited": "pending",
+    "registration_code": {
+      "code": "TRIAL"
+    }
+  },
+  {
+    "email": "second@user.com",
+    "permission_level": 40,
+    "project": "user/project",
+    "invited": "pending",
+    "registration_code": {
+      "code": "TRIAL"
+    }
+  }
+]
