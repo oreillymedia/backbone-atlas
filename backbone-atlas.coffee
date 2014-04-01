@@ -106,7 +106,11 @@ Atlas = (url, token) ->
       extra_data = {}
       if @collection
         extra_data[@collection.collaborator_type] = @collection.collaborator_id
-      root.Model.prototype.destroy.call(this, _.extend(data: extra_data, options))
+        
+      root.Model.prototype.destroy.call(this, _.extend({
+        data: extra_data
+        processData: true
+      }, options))  
   )
 
   @Collaborators = @Collection.extend(
