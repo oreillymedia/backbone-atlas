@@ -6,6 +6,7 @@ Atlas = (url, token) ->
 
   # Sync
   # --------------------------------------------------------
+  
   @Model = Backbone.Model.extend()
   @Collection = Backbone.Collection.extend()
 
@@ -99,7 +100,14 @@ Atlas = (url, token) ->
   # Collaborators
   # --------------------------------------------------------
 
-  @Collaborator = @Model.extend()
+  @Collaborator = @Model.extend(
+
+    destroy: (options) ->
+      extra_data = {}
+      if @collection
+        extra_data[@collection.collaborator_type] = @collection.collaborator_id
+      root.Model.prototype.destroy.call(this, _.extend(data: extra_data, options))
+  )
 
   @Collaborators = @Collection.extend(
 

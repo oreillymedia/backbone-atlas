@@ -90,7 +90,18 @@
       url: "" + root.url + "/login_registration_codes",
       model: root.LoginRegistrationCode
     });
-    this.Collaborator = this.Model.extend();
+    this.Collaborator = this.Model.extend({
+      destroy: function(options) {
+        var extra_data;
+        extra_data = {};
+        if (this.collection) {
+          extra_data[this.collection.collaborator_type] = this.collection.collaborator_id;
+        }
+        return root.Model.prototype.destroy.call(this, _.extend({
+          data: extra_data
+        }, options));
+      }
+    });
     this.Collaborators = this.Collection.extend({
       model: root.Collaborator,
       url: function() {

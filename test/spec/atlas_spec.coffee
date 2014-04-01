@@ -121,6 +121,27 @@ describe("Atlas", ->
   # Atlas.Collaborators
   # ----------------------------------------------------------------
 
+  describe("Collaborator", ->
+
+    describe("#destroy", ->
+
+      it("should use project if present in collection", (done) ->
+        collection = new atlas.Collaborators([], project: "user/project")
+        model = collection.add(
+          id: 1
+        )
+        spyOnAjax();
+        model.destroy(
+          success: ->
+            expect(lastAjaxCall().args[0].type).toEqual("DELETE")
+            expect(lastAjaxCall().args[0].url).toEqual(url + "/collaborators/1")
+            expect(lastAjaxCallData().project).toEqual("user/project")
+            done()
+        )
+      )
+    )
+  )
+
   describe("Collaborators", ->
   
     describe("#fetch", ->
