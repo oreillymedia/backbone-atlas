@@ -140,7 +140,6 @@ Atlas = (url, token) ->
 
     # Custom create function. Used to add project or group info to create call
     create: (attributes, options) ->
-      console.log options
       attributes[@collaborator_type] = @collaborator_id
       root.Collection.prototype.create.call(this, attributes, options)
   ,
