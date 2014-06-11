@@ -6,9 +6,14 @@ Atlas = (url, token) ->
 
   # Sync
   # --------------------------------------------------------
-  
-  @Model = Backbone.Model.extend()
-  @Collection = Backbone.Collection.extend()
+
+  @sync = (method, model, options) ->
+    #options.data = options.data || {}
+    #options.data.auth_token = root.token if root.token
+    Backbone.sync method, model, options
+
+  @Model = Backbone.Model.extend(sync: @sync)
+  @Collection = Backbone.Collection.extend(sync: @sync)
 
   # Builds
   # --------------------------------------------------------
@@ -135,10 +140,37 @@ Atlas = (url, token) ->
 
     # Custom create function. Used to add project or group info to create call
     create: (attributes, options) ->
+      console.log options
       attributes[@collaborator_type] = @collaborator_id
       root.Collection.prototype.create.call(this, attributes, options)
   ,
     ERROR_INIT : "You have to initialize this collection with a project path or group id"
+  )
+
+  # Merge
+  # --------------------------------------------------------
+
+  @Merge = @Model.extend(
+
+    ERROR_INIT: "You have to initialize this model with a project and merge_request_id property"
+    
+    initialize: (attributes, options) ->
+      if !options.project && !options.merge_request_id then throw @ERROR_INIT
+      @project = options.project
+      @merge_request_id = options.merge_request_id
+    
+    url: ->
+      url = "#{root.url}/merges"
+      url += "/#{@id}" if @id
+      url
+    
+    save: (attributes, options) ->
+      attributes.project = @project
+      attributes.merge_request_id = @merge_request_id
+      root.Model.prototype.save.call(this, attributes, options)
+
+    fetch: (options) ->
+      root.Model.prototype.fetch.call(this, _.extend(data: {project:@project}, options))
   )
 
   # Initialize

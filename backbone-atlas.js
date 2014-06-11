@@ -7,8 +7,15 @@
     root = this;
     this.url = url;
     this.token = token;
-    this.Model = Backbone.Model.extend();
-    this.Collection = Backbone.Collection.extend();
+    this.sync = function(method, model, options) {
+      return Backbone.sync(method, model, options);
+    };
+    this.Model = Backbone.Model.extend({
+      sync: this.sync
+    });
+    this.Collection = Backbone.Collection.extend({
+      sync: this.sync
+    });
     this.Build = this.Model.extend({
       backboneClass: "Build",
       toJSON: function() {
@@ -98,7 +105,8 @@
           extra_data[this.collection.collaborator_type] = this.collection.collaborator_id;
         }
         return root.Model.prototype.destroy.call(this, _.extend({
-          data: extra_data
+          data: extra_data,
+          processData: true
         }, options));
       }
     });
@@ -131,11 +139,41 @@
         }, options));
       },
       create: function(attributes, options) {
+        console.log(options);
         attributes[this.collaborator_type] = this.collaborator_id;
         return root.Collection.prototype.create.call(this, attributes, options);
       }
     }, {
       ERROR_INIT: "You have to initialize this collection with a project path or group id"
+    });
+    this.Merge = this.Model.extend({
+      ERROR_INIT: "You have to initialize this model with a project and merge_request_id property",
+      initialize: function(attributes, options) {
+        if (!options.project && !options.merge_request_id) {
+          throw this.ERROR_INIT;
+        }
+        this.project = options.project;
+        return this.merge_request_id = options.merge_request_id;
+      },
+      url: function() {
+        url = "" + root.url + "/merges";
+        if (this.id) {
+          url += "/" + this.id;
+        }
+        return url;
+      },
+      save: function(attributes, options) {
+        attributes.project = this.project;
+        attributes.merge_request_id = this.merge_request_id;
+        return root.Model.prototype.save.call(this, attributes, options);
+      },
+      fetch: function(options) {
+        return root.Model.prototype.fetch.call(this, _.extend({
+          data: {
+            project: this.project
+          }
+        }, options));
+      }
     });
     return this;
   };

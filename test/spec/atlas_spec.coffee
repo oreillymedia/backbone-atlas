@@ -56,6 +56,14 @@ describe("Atlas", ->
       atlas = new Atlas(url)
       expect(atlas.url).toBe(url)
     )
+
+    it("should add auth_token to requests if given", ->
+      atlas = new Atlas(url, token)
+      builds = new atlas.Builds([], project:"user/project")
+      spyOnAjax()
+      builds.fetch()
+      expect(lastAjaxCallData().auth_token).toBe(token)
+    )
   )
 
   # Atlas.Build
@@ -164,40 +172,83 @@ describe("Atlas", ->
         )
       )
     )
-  )
   
-  describe("#create", ->
+    describe("#create", ->
+      
+      it("should create collaborator for group", ->
+        collection = new atlas.Collaborators([], group:1)
+        spyOnAjax()
+        collection.create(
+          email: "first@user.com"
+          permission_level: 40
+          group_name: "somegroup"
+        )
+        expect(lastAjaxCall().args[0].type).toEqual("POST")
+        expect(lastAjaxCall().args[0].url).toEqual(url + "/collaborators")
+        expect(lastAjaxCallData()).not.toBe(undefined)
+        expect(lastAjaxCallData().group).toBe(1)
+        expect(lastAjaxCallData().group_name).toEqual("somegroup")
+        expect(lastAjaxCallData().email).toEqual("first@user.com")
+        expect(lastAjaxCallData().permission_level).toEqual(40)
+      )
     
-    it("should create collaborator for group", ->
-      collection = new atlas.Collaborators([], group:1)
-      spyOnAjax()
-      collection.create(
-        email: "first@user.com"
-        permission_level: 40
-        group_name: "somegroup"
+      it("should create collaborator for project", ->
+        collection = new atlas.Collaborators([], project:"user/project")
+        spyOnAjax()
+        collection.create(
+          email: "first@user.com"
+          permission_level: 40
+        )
+        expect(lastAjaxCall().args[0].type).toEqual("POST")
+        expect(lastAjaxCall().args[0].url).toEqual(url + "/collaborators")
+        expect(lastAjaxCallData()).not.toBe(undefined)
+        expect(lastAjaxCallData().project).toEqual("user/project")
+        expect(lastAjaxCallData().email).toEqual("first@user.com")
+        expect(lastAjaxCallData().permission_level).toEqual(40)
       )
-      expect(lastAjaxCall().args[0].type).toEqual("POST")
-      expect(lastAjaxCall().args[0].url).toEqual(url + "/collaborators")
-      expect(lastAjaxCallData()).not.toBe(undefined)
-      expect(lastAjaxCallData().group).toBe(1)
-      expect(lastAjaxCallData().group_name).toEqual("somegroup")
-      expect(lastAjaxCallData().email).toEqual("first@user.com")
-      expect(lastAjaxCallData().permission_level).toEqual(40)
     )
-  
-    it("should create collaborator for project", ->
-      collection = new atlas.Collaborators([], project:"user/project")
-      spyOnAjax()
-      collection.create(
-        email: "first@user.com"
-        permission_level: 40
+  )
+
+  # Atlas.Merges
+  # ----------------------------------------------------------------
+
+  describe("Merge", ->
+
+    describe("#fetch", ->
+
+      it("should add info to save", (done) ->
+        model = new atlas.Merge([], 
+          project: "user/project"
+          merge_request_id: 1
+        )
+        spyOnAjax()
+        model.save([],
+          success: ->
+            expect(lastAjaxCall().args[0].type).toEqual("POST")
+            expect(lastAjaxCall().args[0].url).toEqual(url + "/merges")
+            expect(lastAjaxCallData().project).toEqual("user/project")
+            expect(lastAjaxCallData().merge_request_id).toEqual(1)
+            expect(model.id).toEqual("abcdefg")
+            done()
+        )
       )
-      expect(lastAjaxCall().args[0].type).toEqual("POST")
-      expect(lastAjaxCall().args[0].url).toEqual(url + "/collaborators")
-      expect(lastAjaxCallData()).not.toBe(undefined)
-      expect(lastAjaxCallData().project).toEqual("user/project")
-      expect(lastAjaxCallData().email).toEqual("first@user.com")
-      expect(lastAjaxCallData().permission_level).toEqual(40)
+
+      it("should add info to fetch", (done) ->
+        model = new atlas.Merge(
+          id: 2
+        , 
+          project: "user/project"
+          merge_request_id: 1
+        )
+        spyOnAjax()
+        model.fetch(
+          success: ->
+            expect(lastAjaxCall().args[0].type).toEqual("GET")
+            expect(lastAjaxCall().args[0].url).toEqual(url + "/merges/2")
+            expect(lastAjaxCallData().project).toEqual("user/project")
+            done()
+        )
+      )
     )
   )
 )
