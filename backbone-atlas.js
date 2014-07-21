@@ -104,6 +104,9 @@
         if (this.collection) {
           extra_data[this.collection.collaborator_type] = this.collection.collaborator_id;
         }
+        if (this.get('invited')) {
+          extra_data['invited'] = this.get('invited');
+        }
         return root.Model.prototype.destroy.call(this, _.extend({
           data: extra_data,
           processData: true
@@ -139,7 +142,6 @@
         }, options));
       },
       create: function(attributes, options) {
-        console.log(options);
         attributes[this.collaborator_type] = this.collaborator_id;
         return root.Collection.prototype.create.call(this, attributes, options);
       }
