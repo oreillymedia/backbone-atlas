@@ -1,4 +1,4 @@
-Backbone for the OReilly Atlas API
+This repo has been deprecated, and the code now lives in `orm-atlas`
 ==================================================
 
 `backbone-atlas` is an open-source JavaScript library built on Backbone.js, to be used in browsers to load data via the [Atlas API](http://atlasdocs.oreilly.com/ch09.html#atlas-api).
